@@ -105,9 +105,10 @@ local function blackoutAndTeleport()
     local character = player.Character
     if character and character:FindFirstChild("HumanoidRootPart") then
         local humanoidRootPart = character.HumanoidRootPart
+        local currentCFrame = humanoidRootPart.CFrame  -- Preserve the current CFrame
         local direction = humanoidRootPart.CFrame.LookVector  -- Get the direction the HumanoidRootPart is facing
         local newPosition = humanoidRootPart.Position + direction * 25  -- Calculate new position
-        humanoidRootPart.CFrame = CFrame.new(newPosition)  -- Teleport the player
+        humanoidRootPart.CFrame = CFrame.new(newPosition, currentCFrame.Position + currentCFrame.LookVector)  -- Teleport with preserved orientation
     end
 end
 
