@@ -81,140 +81,140 @@ timeStopSound2.Parent = playerGui
 
 -- Function to handle screen blackout, teleportation, and play sound (Time Skip)
 local function blackoutAndTeleport()
-    local tweenService = game:GetService("TweenService")
-    
-    -- Create Tween Info
-    local blackoutDuration = 0.095
-    local tweenInfo = TweenInfo.new(blackoutDuration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-    
-    -- Tween to fade in
-    local tweenIn = tweenService:Create(blackScreen, tweenInfo, {BackgroundTransparency = 0})
-    
-    -- Tween to fade out
-    local tweenOut = tweenService:Create(blackScreen, tweenInfo, {BackgroundTransparency = 1})
-    
-    tweenIn:Play()
-    tweenIn.Completed:Connect(function()
-        timeSkipSound:Play()  -- Play the sound during teleportation
-        wait(blackoutDuration)  -- Wait for the duration of the blackout
-        tweenOut:Play()
-    end)
-    
-    -- Teleport the player
-    local character = player.Character
-    if character and character:FindFirstChild("HumanoidRootPart") then
-        local humanoidRootPart = character.HumanoidRootPart
-        local direction = humanoidRootPart.CFrame.LookVector  -- Get the direction the HumanoidRootPart is facing
-        local newPosition = humanoidRootPart.Position + direction * 25  -- Calculate new position
-        humanoidRootPart.CFrame = CFrame.new(newPosition)  -- Teleport the player
-    end
+	local tweenService = game:GetService("TweenService")
+
+	-- Create Tween Info
+	local blackoutDuration = 0.095
+	local tweenInfo = TweenInfo.new(blackoutDuration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+
+	-- Tween to fade in
+	local tweenIn = tweenService:Create(blackScreen, tweenInfo, {BackgroundTransparency = 0})
+
+	-- Tween to fade out
+	local tweenOut = tweenService:Create(blackScreen, tweenInfo, {BackgroundTransparency = 1})
+
+	tweenIn:Play()
+	tweenIn.Completed:Connect(function()
+		timeSkipSound:Play()  -- Play the sound during teleportation
+		wait(blackoutDuration)  -- Wait for the duration of the blackout
+		tweenOut:Play()
+	end)
+
+	-- Teleport the player
+	local character = player.Character
+	if character and character:FindFirstChild("HumanoidRootPart") then
+		local humanoidRootPart = character.HumanoidRootPart
+		local direction = humanoidRootPart.CFrame.LookVector  -- Get the direction the HumanoidRootPart is facing
+		local newPosition = humanoidRootPart.Position + direction * 25  -- Calculate new position
+		humanoidRootPart.CFrame = CFrame.new(newPosition)  -- Teleport the player
+	end
 end
 
 -- Function to freeze and unfreeze all players except the time stop user
 local function freezePlayers(freeze)
-    for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
-        if otherPlayer ~= player and otherPlayer.Character then
-            for _, part in ipairs(otherPlayer.Character:GetChildren()) do
-                if part:IsA("BasePart") then
-                    part.Anchored = freeze
-                end
-            end
-        end
-    end
+	for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
+		if otherPlayer ~= player and otherPlayer.Character then
+			for _, part in ipairs(otherPlayer.Character:GetChildren()) do
+				if part:IsA("BasePart") then
+					part.Anchored = freeze
+				end
+			end
+		end
+	end
 end
 
 -- Function to freeze the time stop user for 2.5 seconds
 local function freezeTimeStopUser()
-    local character = player.Character
-    if not character then return end
+	local character = player.Character
+	if not character then return end
 
-    -- Freeze the time stop user
-    for _, part in ipairs(character:GetChildren()) do
-        if part:IsA("BasePart") then
-            part.Anchored = true
-        end
-    end
-    
-    -- Unfreeze the time stop user after 2.5 seconds
-    wait(2.5)
-    for _, part in ipairs(character:GetChildren()) do
-        if part:IsA("BasePart") then
-            part.Anchored = false
-        end
-    end
+	-- Freeze the time stop user
+	for _, part in ipairs(character:GetChildren()) do
+		if part:IsA("BasePart") then
+			part.Anchored = true
+		end
+	end
+
+	-- Unfreeze the time stop user after 2.5 seconds
+	wait(2.5)
+	for _, part in ipairs(character:GetChildren()) do
+		if part:IsA("BasePart") then
+			part.Anchored = false
+		end
+	end
 end
 
 -- Function to handle sphere creation, animation, and freezing other players
 local function createAndAnimateSpheres()
-    -- Play the first Time Stop audio immediately
-    timeStopSound1:Play()
-    
-    -- Wait 2.5 seconds before creating spheres
-    wait(2.5)
-    
-    -- Play the second Time Stop audio after 1.5 seconds
-    wait(1.5)
-    timeStopSound2:Play()
-    
-    -- Helper function to create and animate a sphere
-    local function createAndAnimateSphere(position, delay)
-        wait(delay)
-        
-        local sphere = Instance.new("Part")
-        sphere.Size = Vector3.new(5, 5, 5)  -- Initial size of the sphere
-        sphere.Position = position
-        sphere.Shape = Enum.PartType.Ball
-        sphere.Material = Enum.Material.ForceField
-        sphere.Color = Color3.new(0, 0, 0)  -- Black color
-        sphere.Anchored = true
-        sphere.CanCollide = false
-        sphere.Parent = workspace
-        
-        -- Animation settings
-        local expandInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-        local shrinkInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-        
-        -- Expand tween
-        local expandTween = tweenService:Create(sphere, expandInfo, {Size = Vector3.new(250, 250, 250)})
-        
-        -- Shrink tween
-        local shrinkTween = tweenService:Create(sphere, shrinkInfo, {Size = Vector3.new(5, 5, 5)})
-        
-        -- Run the animation
-        expandTween:Play()
-        expandTween.Completed:Connect(function()
-            -- Shrink the sphere immediately after expanding
-            shrinkTween:Play()
-            shrinkTween.Completed:Connect(function()
-                sphere:Destroy()  -- Destroy the sphere after shrinking
-            end)
-        end)
-    end
-    
-    -- Get the player's position
-    local position = player.Character.HumanoidRootPart.Position
-    
-    -- Create and animate the first sphere immediately
-    createAndAnimateSphere(position, 0)
-    
-    -- Create and animate the second sphere with a delay of 0.025 seconds
-    createAndAnimateSphere(position, 0.025)
-    
-    -- Freeze the time stop user for 2.5 seconds
-    freezeTimeStopUser()
-    
-    -- Freeze all players except the user for 10 seconds
-    freezePlayers(true)
-    wait(10)
-    freezePlayers(false)
+	-- Play the first Time Stop audio immediately
+	timeStopSound1:Play()
+
+	-- Wait 2.5 seconds before creating spheres
+	wait(2.5)
+
+	-- Play the second Time Stop audio after 1.5 seconds
+	wait(1.5)
+	timeStopSound2:Play()
+
+	-- Helper function to create and animate a sphere
+	local function createAndAnimateSphere(position, delay)
+		wait(delay)
+
+		local sphere = Instance.new("Part")
+		sphere.Size = Vector3.new(5, 5, 5)  -- Initial size of the sphere
+		sphere.Position = position
+		sphere.Shape = Enum.PartType.Ball
+		sphere.Material = Enum.Material.ForceField
+		sphere.Color = Color3.new(0, 0, 0)  -- Black color
+		sphere.Anchored = true
+		sphere.CanCollide = false
+		sphere.Parent = workspace
+
+		-- Animation settings
+		local expandInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+		local shrinkInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+
+		-- Expand tween
+		local expandTween = tweenService:Create(sphere, expandInfo, {Size = Vector3.new(250, 250, 250)})
+
+		-- Shrink tween
+		local shrinkTween = tweenService:Create(sphere, shrinkInfo, {Size = Vector3.new(5, 5, 5)})
+
+		-- Run the animation
+		expandTween:Play()
+		expandTween.Completed:Connect(function()
+			-- Shrink the sphere immediately after expanding
+			shrinkTween:Play()
+			shrinkTween.Completed:Connect(function()
+				sphere:Destroy()  -- Destroy the sphere after shrinking
+			end)
+		end)
+	end
+
+	-- Get the player's position
+	local position = player.Character.HumanoidRootPart.Position
+
+	-- Create and animate the first sphere immediately
+	createAndAnimateSphere(position, 0)
+
+	-- Create and animate the second sphere with a delay of 0.025 seconds
+	createAndAnimateSphere(position, 0.025)
+
+	-- Freeze the time stop user for 2.5 seconds
+	freezeTimeStopUser()
+
+	-- Freeze all players except the user for 10 seconds
+	freezePlayers(true)
+	wait(10)
+	freezePlayers(false)
 end
 
 -- Connect Time Skip to the first button
 textButton1.MouseButton1Click:Connect(function()
-    blackoutAndTeleport()
+	blackoutAndTeleport()
 end)
 
 -- Connect Time Stop to the second button
 textButton2.MouseButton1Click:Connect(function()
-    createAndAnimateSpheres()  -- Call the function to create and animate spheres and freeze players
+	createAndAnimateSpheres()  -- Call the function to create and animate spheres and freeze players
 end)
