@@ -256,7 +256,37 @@ textButton1.MouseButton1Click:Connect(function()
     blackoutAndTeleport()
 end)
 
--- Connect Time Stop to the second button
+-- Modify the Time Stop button click function
 textButton2.MouseButton1Click:Connect(function()
-    createAndAnimateSpheres()
+    -- Disable the Time Stop button
+    textButton2.Active = false  -- Disable the button
+
+    createAndAnimateSpheres()  -- Call the function to create and animate spheres
+    freezeAndUnfreezeCharacter()  -- Call the function to freeze and unfreeze the character
+    
+    -- Add a delay to re-enable the button after other players unfreeze
+    local unfreezeTime = 10  -- Time players stay frozen
+    wait(unfreezeTime)  -- Wait for players to unfreeze
+
+    -- Start the cooldown timer (15 seconds) with countdown in seconds and milliseconds
+    local cooldownTime = 15
+    local startTime = tick()  -- Get the current time in seconds
+    
+    while cooldownTime > 0 do
+        -- Calculate elapsed time
+        local elapsed = tick() - startTime
+        local remainingTime = math.max(0, cooldownTime - elapsed)  -- Ensure it doesn't go below 0
+        
+        -- Format remaining time as seconds with milliseconds
+        textButton2.Text = string.format("%.1f", remainingTime)
+        
+        -- Wait for a short time to update the text again
+        wait(0.1)  -- Update every 100 milliseconds
+    end
+
+    -- Re-enable the Time Stop button once the cooldown finishes
+    textButton2.Text = "Time Stop"
+    textButton2.TextTransparency = 0  -- Reset text transparency
+    textButton2.BackgroundTransparency = 0.5  -- Reset background transparency
+    textButton2.Active = true  -- Re-enable the button
 end)
