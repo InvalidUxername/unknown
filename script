@@ -80,12 +80,6 @@ timeStopSound2.SoundId = "rbxassetid://5326246476"  -- Replace with your second 
 timeStopSound2.Volume = 1
 timeStopSound2.Parent = playerGui
 
--- Create the unfreeze sound
-local unfreezeSound = Instance.new("Sound")
-unfreezeSound.SoundId = "rbxassetid://5687891658"  -- Replace with your Unfreeze audio asset ID
-unfreezeSound.Volume = 1
-unfreezeSound.Parent = playerGui
-
 -- Function to handle screen blackout, teleportation, and play sound (Time Skip)
 local function blackoutAndTeleport()
     local tweenService = game:GetService("TweenService")
@@ -191,7 +185,10 @@ local function createAndAnimateSpheres()
     wait(1.5)
     timeStopSound2:Play()
     
-    -- Create and animate spheres
+    -- Apply gray atmosphere with fade-in
+    local grayEffect = createGrayAtmosphere()
+    
+    -- Helper function to create and animate a sphere
     local function createAndAnimateSphere(position, delay)
         wait(delay)
         
@@ -207,8 +204,8 @@ local function createAndAnimateSpheres()
         
         -- Animation settings
         local tweenService = game:GetService("TweenService")
-        local expandInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
-        local shrinkInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+        local expandInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)  -- Longer duration for expand
+        local shrinkInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)  -- Longer duration for shrink
         
         -- Expand and shrink tween
         local expandTween = tweenService:Create(sphere, expandInfo, {Size = Vector3.new(250, 250, 250)})
@@ -216,20 +213,12 @@ local function createAndAnimateSpheres()
         
         -- Run the animation
         expandTween:Play()
-        
-        -- Create gray atmosphere during expansion
-        local grayEffect = createGrayAtmosphere()
-        
         expandTween.Completed:Connect(function()
             shrinkTween:Play()
             shrinkTween.Completed:Connect(function()
                 sphere:Destroy()  -- Destroy the sphere after shrinking
             end)
         end)
-        
-        -- Remove gray atmosphere after 10 seconds
-        wait(10)
-        removeGrayAtmosphere(grayEffect)
     end
     
     -- Get the player's position
@@ -247,9 +236,11 @@ local function createAndAnimateSpheres()
     -- Freeze the time stop user for 2.5 seconds
     freezeTimeStopUser()
     
-    -- Play the unfreeze sound and unfreeze all players after 10 seconds
+    -- Keep the gray atmosphere for 10 seconds
     wait(10)
-    unfreezeSound:Play()
+    
+    -- Remove the gray atmosphere and unfreeze all players
+    removeGrayAtmosphere(grayEffect)
     freezePlayers(false)
 end
 
