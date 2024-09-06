@@ -238,7 +238,13 @@ local function createAndAnimateSpheres()
     
     -- Keep the gray atmosphere for 10 seconds
     wait(10)
-    
+
+local unfrozenSound = Instance.new("Sound")
+    unfrozenSound.SoundId = "rbxassetid://5687891658"  -- Replace with your audio asset ID
+    unfrozenSound.Volume = 1
+    unfrozenSound.Parent = playerGui
+    unfrozenSound:Play()
+
     -- Remove the gray atmosphere and unfreeze all players
     removeGrayAtmosphere(grayEffect)
     freezePlayers(false)
