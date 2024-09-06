@@ -1,6 +1,5 @@
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local mouse = player:GetMouse()
 local tweenService = game:GetService("TweenService")
 
 -- Create a ScreenGui
@@ -20,7 +19,7 @@ blackScreen.Parent = screenGui
 local textButton1 = Instance.new("TextButton")
 textButton1.Size = UDim2.new(0, 60, 0, 60)
 textButton1.Position = UDim2.new(0.475, 0, 1, -5)  -- Positioned slightly left of the center
-textButton1.AnchorPoint = Vector2.new(0.5, 1)  -- Anchored at the bottom center
+textButton1.AnchorPoint = Vector2.new(0.5, 1)
 textButton1.Text = "Time Skip"
 textButton1.TextColor3 = Color3.new(1, 1, 1)
 textButton1.BorderSizePixel = 0
@@ -31,8 +30,8 @@ textButton1.Parent = screenGui
 
 -- Create the letter label for the first button
 local letterLabel1 = Instance.new("TextLabel")
-letterLabel1.Size = UDim2.new(1, 0, 0.3, 0)  -- Size relative to the button
-letterLabel1.Position = UDim2.new(0, 0, -0.15, 0)  -- Position at the top of the button
+letterLabel1.Size = UDim2.new(1, 0, 0.3, 0)
+letterLabel1.Position = UDim2.new(0, 0, -0.15, 0)
 letterLabel1.Text = "1"
 letterLabel1.TextColor3 = Color3.new(1, 1, 1)
 letterLabel1.TextScaled = false
@@ -43,7 +42,7 @@ letterLabel1.Parent = textButton1
 -- Create the second TextButton (Time Stop)
 local textButton2 = Instance.new("TextButton")
 textButton2.Size = UDim2.new(0, 60, 0, 60)
-textButton2.Position = UDim2.new(0.525, 0, 1, -5)  -- Positioned slightly right of the center
+textButton2.Position = UDim2.new(0.525, 0, 1, -5)
 textButton2.AnchorPoint = Vector2.new(0.5, 1)
 textButton2.Text = "Time Stop"
 textButton2.TextColor3 = Color3.new(1, 1, 1)
@@ -65,6 +64,11 @@ letterLabel2.BackgroundTransparency = 1
 letterLabel2.Parent = textButton2
 
 -- Create and configure the Sound objects
+local timeSkipSound = Instance.new("Sound")
+timeSkipSound.SoundId = "rbxassetid://6920047468"  -- Replace with your Time Skip audio asset ID
+timeSkipSound.Volume = 1
+timeSkipSound.Parent = playerGui
+
 local timeStopSound1 = Instance.new("Sound")
 timeStopSound1.SoundId = "rbxassetid://5978825194"  -- Replace with your first Time Stop audio asset ID
 timeStopSound1.Volume = 1
@@ -75,6 +79,37 @@ timeStopSound2.SoundId = "rbxassetid://5326246476"  -- Replace with your second 
 timeStopSound2.Volume = 1
 timeStopSound2.Parent = playerGui
 
+-- Function to handle screen blackout, teleportation, and play sound (Time Skip)
+local function blackoutAndTeleport()
+    local tweenService = game:GetService("TweenService")
+    
+    -- Create Tween Info
+    local blackoutDuration = 0.095
+    local tweenInfo = TweenInfo.new(blackoutDuration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+    
+    -- Tween to fade in
+    local tweenIn = tweenService:Create(blackScreen, tweenInfo, {BackgroundTransparency = 0})
+    
+    -- Tween to fade out
+    local tweenOut = tweenService:Create(blackScreen, tweenInfo, {BackgroundTransparency = 1})
+    
+    tweenIn:Play()
+    tweenIn.Completed:Connect(function()
+        timeSkipSound:Play()  -- Play the sound during teleportation
+        wait(blackoutDuration)  -- Wait for the duration of the blackout
+        tweenOut:Play()
+    end)
+    
+    -- Teleport the player
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = character.HumanoidRootPart
+        local direction = humanoidRootPart.CFrame.LookVector  -- Get the direction the HumanoidRootPart is facing
+        local newPosition = humanoidRootPart.Position + direction * 25  -- Calculate new position
+        humanoidRootPart.CFrame = CFrame.new(newPosition)  -- Teleport the player
+    end
+end
+
 -- Function to freeze and unfreeze all players except the time stop user
 local function freezePlayers(freeze)
     for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
@@ -84,6 +119,27 @@ local function freezePlayers(freeze)
                     part.Anchored = freeze
                 end
             end
+        end
+    end
+end
+
+-- Function to freeze the time stop user for 2.5 seconds
+local function freezeTimeStopUser()
+    local character = player.Character
+    if not character then return end
+
+    -- Freeze the time stop user
+    for _, part in ipairs(character:GetChildren()) do
+        if part:IsA("BasePart") then
+            part.Anchored = true
+        end
+    end
+    
+    -- Unfreeze the time stop user after 2.5 seconds
+    wait(2.5)
+    for _, part in ipairs(character:GetChildren()) do
+        if part:IsA("BasePart") then
+            part.Anchored = false
         end
     end
 end
@@ -115,22 +171,19 @@ local function createAndAnimateSpheres()
         sphere.Parent = workspace
         
         -- Animation settings
-        local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+        local expandInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+        local shrinkInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
         
-        -- Expand and shrink tween
-        local expandTween = tweenService:Create(sphere, tweenInfo, {Size = Vector3.new(250, 250, 250)})
-        local shrinkTween = tweenService:Create(sphere, tweenInfo, {Size = Vector3.new(5, 5, 5)})
+        -- Expand tween
+        local expandTween = tweenService:Create(sphere, expandInfo, {Size = Vector3.new(250, 250, 250)})
+        
+        -- Shrink tween
+        local shrinkTween = tweenService:Create(sphere, shrinkInfo, {Size = Vector3.new(5, 5, 5)})
         
         -- Run the animation
         expandTween:Play()
         expandTween.Completed:Connect(function()
-            -- Freeze all players except the user for 10 seconds
-            freezePlayers(true)
-            
-            -- Wait for 10 seconds before unfreezing players
-            wait(10)
-            freezePlayers(false)
-            
+            -- Shrink the sphere immediately after expanding
             shrinkTween:Play()
             shrinkTween.Completed:Connect(function()
                 sphere:Destroy()  -- Destroy the sphere after shrinking
@@ -146,9 +199,22 @@ local function createAndAnimateSpheres()
     
     -- Create and animate the second sphere with a delay of 0.025 seconds
     createAndAnimateSphere(position, 0.025)
+    
+    -- Freeze the time stop user for 2.5 seconds
+    freezeTimeStopUser()
+    
+    -- Freeze all players except the user for 10 seconds
+    freezePlayers(true)
+    wait(10)
+    freezePlayers(false)
 end
 
--- Connect function to the Time Stop button
+-- Connect Time Skip to the first button
+textButton1.MouseButton1Click:Connect(function()
+    blackoutAndTeleport()
+end)
+
+-- Connect Time Stop to the second button
 textButton2.MouseButton1Click:Connect(function()
     createAndAnimateSpheres()  -- Call the function to create and animate spheres and freeze players
 end)
