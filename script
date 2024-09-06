@@ -64,6 +64,44 @@ letterLabel2.TextSize = 12.5
 letterLabel2.BackgroundTransparency = 1  -- Transparent background
 letterLabel2.Parent = textButton2
 
+-- Create the third TextButton (Taunt)
+local textButton3 = Instance.new("TextButton")
+textButton3.Size = UDim2.new(0, 60, 0, 60)
+textButton3.Position = UDim2.new(0.575, 0, 1, -5)  -- Positioned to the right of the other buttons
+textButton3.AnchorPoint = Vector2.new(0.5, 1)  -- Anchored at the bottom center
+textButton3.Text = "Taunt"
+textButton3.TextColor3 = Color3.new(1, 1, 1)
+textButton3.BorderSizePixel = 0
+textButton3.BackgroundTransparency = 0.5
+textButton3.TextTransparency = 0
+textButton3.BackgroundColor3 = Color3.new(0, 0, 0)
+textButton3.Parent = screenGui
+
+-- Create the letter label for the third button
+local letterLabel3 = Instance.new("TextLabel")
+letterLabel3.Size = UDim2.new(1, 0, 0.3, 0)  -- Size relative to the button
+letterLabel3.Position = UDim2.new(0, 0, -0.15, 0)  -- Position at the top of the button
+letterLabel3.Text = "3"  -- The letter to display
+letterLabel3.TextColor3 = Color3.new(1, 1, 1)  -- Text color
+letterLabel3.TextScaled = false  -- No automatic scaling
+letterLabel3.TextSize = 12.5
+letterLabel3.BackgroundTransparency = 1  -- Transparent background
+letterLabel3.Parent = textButton3
+
+-- Create and configure the Sound object for Taunt
+local tauntSound = Instance.new("Sound")
+tauntSound.SoundId = "rbxassetid://5808893495"  -- Replace with your Taunt audio asset ID
+tauntSound.Volume = 1
+tauntSound.Parent = playerGui
+
+-- Function to play taunt sound
+local function playTauntSound()
+    tauntSound:Play()
+end
+
+-- Connect Taunt button to play the sound
+textButton3.MouseButton1Click:Connect(playTauntSound)
+
 -- Create and configure the Sound objects
 local timeSkipSound = Instance.new("Sound")
 timeSkipSound.SoundId = "rbxassetid://6920047468"  -- Replace with your Time Skip audio asset ID
