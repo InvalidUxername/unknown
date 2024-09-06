@@ -1,0 +1,154 @@
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+local mouse = player:GetMouse()
+local tweenService = game:GetService("TweenService")
+
+-- Create a ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = playerGui
+
+-- Create the black screen Frame
+local blackScreen = Instance.new("Frame")
+blackScreen.Size = UDim2.new(1, 0, 1, 0)  -- Covers the entire screen
+blackScreen.Position = UDim2.new(0, 0, 0, 0)
+blackScreen.BackgroundColor3 = Color3.new(0, 0, 0)  -- Solid black
+blackScreen.BackgroundTransparency = 1  -- Initially transparent
+blackScreen.ZIndex = 10  -- Ensure it is on top of other UI elements
+blackScreen.Parent = screenGui
+
+-- Create the first TextButton (Time Skip)
+local textButton1 = Instance.new("TextButton")
+textButton1.Size = UDim2.new(0, 60, 0, 60)
+textButton1.Position = UDim2.new(0.475, 0, 1, -5)  -- Positioned slightly left of the center
+textButton1.AnchorPoint = Vector2.new(0.5, 1)  -- Anchored at the bottom center
+textButton1.Text = "Time Skip"
+textButton1.TextColor3 = Color3.new(1, 1, 1)
+textButton1.BorderSizePixel = 0
+textButton1.BackgroundTransparency = 0.5
+textButton1.TextTransparency = 0
+textButton1.BackgroundColor3 = Color3.new(0, 0, 0)
+textButton1.Parent = screenGui
+
+-- Create the letter label for the first button
+local letterLabel1 = Instance.new("TextLabel")
+letterLabel1.Size = UDim2.new(1, 0, 0.3, 0)  -- Size relative to the button
+letterLabel1.Position = UDim2.new(0, 0, -0.15, 0)  -- Position at the top of the button
+letterLabel1.Text = "1"
+letterLabel1.TextColor3 = Color3.new(1, 1, 1)
+letterLabel1.TextScaled = false
+letterLabel1.TextSize = 12.5
+letterLabel1.BackgroundTransparency = 1
+letterLabel1.Parent = textButton1
+
+-- Create the second TextButton (Time Stop)
+local textButton2 = Instance.new("TextButton")
+textButton2.Size = UDim2.new(0, 60, 0, 60)
+textButton2.Position = UDim2.new(0.525, 0, 1, -5)  -- Positioned slightly right of the center
+textButton2.AnchorPoint = Vector2.new(0.5, 1)
+textButton2.Text = "Time Stop"
+textButton2.TextColor3 = Color3.new(1, 1, 1)
+textButton2.BorderSizePixel = 0
+textButton2.BackgroundTransparency = 0.5
+textButton2.TextTransparency = 0
+textButton2.BackgroundColor3 = Color3.new(0, 0, 0)
+textButton2.Parent = screenGui
+
+-- Create the letter label for the second button
+local letterLabel2 = Instance.new("TextLabel")
+letterLabel2.Size = UDim2.new(1, 0, 0.3, 0)
+letterLabel2.Position = UDim2.new(0, 0, -0.15, 0)
+letterLabel2.Text = "2"
+letterLabel2.TextColor3 = Color3.new(1, 1, 1)
+letterLabel2.TextScaled = false
+letterLabel2.TextSize = 12.5
+letterLabel2.BackgroundTransparency = 1
+letterLabel2.Parent = textButton2
+
+-- Create and configure the Sound objects
+local timeStopSound1 = Instance.new("Sound")
+timeStopSound1.SoundId = "rbxassetid://5978825194"  -- Replace with your first Time Stop audio asset ID
+timeStopSound1.Volume = 1
+timeStopSound1.Parent = playerGui
+
+local timeStopSound2 = Instance.new("Sound")
+timeStopSound2.SoundId = "rbxassetid://5326246476"  -- Replace with your second Time Stop audio asset ID
+timeStopSound2.Volume = 1
+timeStopSound2.Parent = playerGui
+
+-- Function to freeze and unfreeze all players except the time stop user
+local function freezePlayers(freeze)
+    for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character then
+            for _, part in ipairs(otherPlayer.Character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.Anchored = freeze
+                end
+            end
+        end
+    end
+end
+
+-- Function to handle sphere creation, animation, and freezing other players
+local function createAndAnimateSpheres()
+    -- Play the first Time Stop audio immediately
+    timeStopSound1:Play()
+    
+    -- Wait 2.5 seconds before creating spheres
+    wait(2.5)
+    
+    -- Play the second Time Stop audio after 1.5 seconds
+    wait(1.5)
+    timeStopSound2:Play()
+    
+    -- Helper function to create and animate a sphere
+    local function createAndAnimateSphere(position, delay)
+        wait(delay)
+        
+        local sphere = Instance.new("Part")
+        sphere.Size = Vector3.new(5, 5, 5)  -- Initial size of the sphere
+        sphere.Position = position
+        sphere.Shape = Enum.PartType.Ball
+        sphere.Material = Enum.Material.ForceField
+        sphere.Color = Color3.new(0, 0, 0)  -- Black color
+        sphere.Anchored = true
+        sphere.CanCollide = false
+        sphere.Parent = workspace
+        
+        -- Animation settings
+        local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+        
+        -- Expand and shrink tween
+        local expandTween = tweenService:Create(sphere, tweenInfo, {Size = Vector3.new(250, 250, 250)})
+        local shrinkTween = tweenService:Create(sphere, tweenInfo, {Size = Vector3.new(5, 5, 5)})
+        
+        -- Run the animation
+        expandTween:Play()
+        expandTween.Completed:Connect(function()
+            -- Freeze all players except the user for 10 seconds
+            freezePlayers(true)
+            
+            -- Wait for 10 seconds before unfreezing players
+            wait(10)
+            freezePlayers(false)
+            
+            shrinkTween:Play()
+            shrinkTween.Completed:Connect(function()
+                sphere:Destroy()  -- Destroy the sphere after shrinking
+            end)
+        end)
+    end
+    
+    -- Get the player's position
+    local position = player.Character.HumanoidRootPart.Position
+    
+    -- Create and animate the first sphere immediately
+    createAndAnimateSphere(position, 0)
+    
+    -- Create and animate the second sphere with a delay of 0.025 seconds
+    createAndAnimateSphere(position, 0.025)
+end
+
+-- Connect function to the Time Stop button
+textButton2.MouseButton1Click:Connect(function()
+    createAndAnimateSpheres()  -- Call the function to create and animate spheres and freeze players
+end)
