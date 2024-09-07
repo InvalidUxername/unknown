@@ -179,11 +179,11 @@ local function createAndAnimateSpheres()
     -- Play the first Time Stop audio immediately
     timeStopSound1:Play()
     
-    -- Wait 2.5 seconds before creating spheres
-    wait(2.5)
+    -- Wait 2 seconds before creating spheres
+    wait(2)
     
-    -- Play the second Time Stop audio after 1.5 seconds
-    wait(1.5)
+    -- Play the second Time Stop audio after 1 second
+    wait(1)
     timeStopSound2:Play()
     
     -- Apply gray atmosphere with fade-in
