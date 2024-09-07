@@ -257,6 +257,5 @@ textButton1.MouseButton1Click:Connect(function()
 end)
 
 textButton2.MouseButton1Click:Connect(function()
-    freezeAndUnfreezeCharacter()
     createAndAnimateSpheres()
 end)
