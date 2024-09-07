@@ -4,7 +4,7 @@ local function applyZeroGravityToPlayer(player, apply)
         local humanoidRootPart = player.Character.HumanoidRootPart
         if apply then
             local bodyVelocity = Instance.new("BodyVelocity")
-            bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            bodyVelocity.Velocity = Vector3.new(0, -25, 0)
             bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)  -- Adjust as needed
             bodyVelocity.Parent = humanoidRootPart
         else
