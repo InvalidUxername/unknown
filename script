@@ -256,36 +256,28 @@ textButton1.MouseButton1Click:Connect(function()
     blackoutAndTeleport()
 end)
 
--- Modify the Time Stop button click function
+-- Connect Time Stop to the second button
 textButton2.MouseButton1Click:Connect(function()
-    -- Disable the Time Stop button
-    textButton2.Active = false  -- Disable the button
-
-    createAndAnimateSpheres()  -- Call the function to create and animate spheres
-    freezeAndUnfreezeCharacter()  -- Call the function to freeze and unfreeze the character
-
-    -- Add a delay to re-enable the button after other players unfreeze
-    local unfreezeTime = 10  -- Time players stay frozen
-    wait(unfreezeTime)  -- Wait for players to unfreeze
-
-    -- Start the cooldown timer (15 seconds) with countdown in seconds and milliseconds
-    local cooldownTime = 15
-
-    for i = cooldownTime * 10, 0, -1 do  -- Countdown loop, 10 steps per second
-        -- Calculate remaining time in seconds and milliseconds
-        local remainingTime = i / 10  -- Convert to seconds with 1 decimal point
-
-        -- Format remaining time to display with 1 decimal place
-        textButton2.Text = string.format("%.1f", remainingTime)
-
-        -- Wait for 0.1 seconds before updating again
-        wait(0.1)
-    end
-
-    -- Re-enable the Time Stop button once the cooldown finishes
-    textButton2.Text = "Time Stop"
-    textButton2.TextTransparency = 0  -- Reset text transparency
-    textButton2.BackgroundTransparency = 0.5  -- Reset background transparency
-    textButton2.Active = true  -- Re-enable the button
+    createAndAnimateSpheres()
 end)
 
+-- Function to disable the Time Skip button
+local function disableTimeSkipButtonFor20Seconds()
+    -- Disable the button
+    textButton1.Active = false
+    textButton1.AutoButtonColor = false
+    textButton1.TextTransparency = 0.5  -- Dim the button text to indicate it is disabled
+
+    -- Re-enable the button after 20 seconds
+    wait(20)
+    textButton1.Active = true
+    textButton1.AutoButtonColor = true
+    textButton1.TextTransparency = 0  -- Restore the button text to normal
+end
+
+-- Connect Time Stop button to trigger sphere animation and freeze effects
+textButton2.MouseButton1Click:Connect(function()
+    createAndAnimateSpheres()  -- Call the function to create and animate spheres
+    freezeAndUnfreezePlayers()  -- Call the function to freeze and unfreeze players
+    disableTimeSkipButtonFor20Seconds()  -- Disable the Time Skip button for 20 seconds
+end)
