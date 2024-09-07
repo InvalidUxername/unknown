@@ -256,23 +256,7 @@ textButton1.MouseButton1Click:Connect(function()
     blackoutAndTeleport()
 end)
 
--- Function to disable the Time Skip button
-local function disableTimeSkipButtonFor20Seconds()
-    -- Disable the button
-    textButton1.Active = false
-    textButton1.AutoButtonColor = false
-    textButton1.TextTransparency = 0.5  -- Dim the button text to indicate it is disabled
-
-    -- Re-enable the button after 20 seconds
-    wait(20)
-    textButton1.Active = true
-    textButton1.AutoButtonColor = true
-    textButton1.TextTransparency = 0  -- Restore the button text to normal
-end
-
--- Connect Time Stop button to trigger sphere animation and freeze effects
+-- Connect Time Stop to the second button
 textButton2.MouseButton1Click:Connect(function()
-    createAndAnimateSpheres()  -- Call the function to create and animate spheres
-    freezeAndUnfreezePlayers()  -- Call the function to freeze and unfreeze players
-    disableTimeSkipButtonFor20Seconds()  -- Disable the Time Skip button for 20 seconds
+    createAndAnimateSpheres()
 end)
