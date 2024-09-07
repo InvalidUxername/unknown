@@ -256,7 +256,21 @@ textButton1.MouseButton1Click:Connect(function()
     blackoutAndTeleport()
 end)
 
-textButton2.MouseButton1Click:Connect(function()
-    freezeAndUnfreezeCharacter()
-    createAndAnimateSpheres()
-end)
+-- Function to handle Time Stop with cooldown
+local function handleTimeStop()
+    -- Disable the Time Stop button
+    textButton2.TextButton1Click = nil  -- Temporarily disable the button
+
+    -- Perform the Time Stop actions
+    createAndAnimateSpheres()  -- Call the function to create and animate spheres
+    freezeAndUnfreezeCharacter()  -- Call the function to freeze and unfreeze the character
+
+    -- Wait for the cooldown period
+    wait(20)  -- 20-second cooldown
+
+    -- Re-enable the Time Stop button
+    textButton2.MouseButton1Click:Connect(handleTimeStop)  -- Reconnect the button click event
+end
+
+-- Connect Time Stop button to handleTimeStop function
+textButton2.MouseButton1Click:Connect(handleTimeStop)
