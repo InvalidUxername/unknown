@@ -64,6 +64,22 @@ letterLabel2.TextSize = 12.5
 letterLabel2.BackgroundTransparency = 1  -- Transparent background
 letterLabel2.Parent = textButton2
 
+-- Function to disable and re-enable the Time Stop button
+local function disableTimeStopButton()
+    -- Disable the button
+    textButton2.TextTransparency = 0.5  -- Make the text slightly transparent to indicate it's disabled
+    textButton2.BackgroundTransparency = 0.75  -- Dim the background to indicate it's disabled
+    textButton2.Active = false  -- Disable the button interaction
+
+    -- Wait 20 seconds
+    wait(20)
+
+    -- Re-enable the button
+    textButton2.TextTransparency = 0  -- Reset the text transparency
+    textButton2.BackgroundTransparency = 0.5  -- Reset the background transparency
+    textButton2.Active = true  -- Re-enable the button interaction
+end
+
 -- Create and configure the Sound objects
 local timeSkipSound = Instance.new("Sound")
 timeSkipSound.SoundId = "rbxassetid://6920047468"  -- Replace with your Time Skip audio asset ID
@@ -256,7 +272,9 @@ textButton1.MouseButton1Click:Connect(function()
     blackoutAndTeleport()
 end)
 
--- Connect Time Stop to the second button
+-- Updated function to handle Time Stop button click
 textButton2.MouseButton1Click:Connect(function()
-    createAndAnimateSpheres()
+    createAndAnimateSpheres()  -- Call the function to create and animate spheres
+    freezeAndUnfreezeCharacter()  -- Call the function to freeze and unfreeze the character
+    disableTimeStopButton()  -- Disable the button for 20 seconds
 end)
