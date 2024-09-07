@@ -256,11 +256,6 @@ textButton1.MouseButton1Click:Connect(function()
     blackoutAndTeleport()
 end)
 
--- Connect Time Stop to the second button
-textButton2.MouseButton1Click:Connect(function()
-    createAndAnimateSpheres()
-end)
-
 -- Function to disable the Time Skip button
 local function disableTimeSkipButtonFor20Seconds()
     -- Disable the button
