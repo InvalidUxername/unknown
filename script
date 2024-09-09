@@ -27,6 +27,7 @@ textButton1.BorderSizePixel = 0
 textButton1.BackgroundTransparency = 0.5
 textButton1.TextTransparency = 0
 textButton1.BackgroundColor3 = Color3.new(0, 0, 0)
+textButton1.Draggable = true
 textButton1.Parent = screenGui
 
 -- Create the letter label for the first button
